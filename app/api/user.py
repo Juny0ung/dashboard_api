@@ -2,9 +2,10 @@ from typing import Annotated
 import re
 from fastapi import APIRouter, Depends, HTTPException, Header, Response
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.api.dependencies import set_access_token, delete_access_token, get_db_session
 
 from .db import schemas, crud
+from .db.base import get_db_session
+from app.api.token import set_access_token, delete_access_token
 
 
 router = APIRouter(
@@ -12,7 +13,7 @@ router = APIRouter(
 )
 
 
-@router.post("/login", tags=["post"])
+@router.post("/login")
 async def log_in(user: schemas.UserLogin, res: Response, sess: AsyncSession = Depends(get_db_session)):
     user_id = await crud.auth_user(sess = sess, user = user)
     if user_id:
@@ -21,11 +22,11 @@ async def log_in(user: schemas.UserLogin, res: Response, sess: AsyncSession = De
     raise HTTPException(status_code=400, detail="Wrong Information")
     
 
-@router.post("/logout", tags=["post"])
+@router.post("/logout")
 def log_out(access_token: Annotated[str | None, Header()] = None):
-    delete_access_token(access_token)
+    return delete_access_token(access_token)
 
-@router.post("/signup", tags=["post"])
+@router.post("/signup")
 async def create_user(user: schemas.UserCreate, sess: AsyncSession = Depends(get_db_session)):
     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
     if not re.fullmatch(regex, user.email):

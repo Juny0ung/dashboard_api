@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from .api import user, post, dashboard
 from .api.db import models, crud, schemas
 from .api.db.base import engine
+from .api.token import init_redis
 
 app = FastAPI()
 
@@ -15,6 +16,7 @@ def log_in():
 
 @app.on_event("startup")
 async def startup_even():
+    await init_redis()
     async with engine.begin() as conn:
         await conn.run_sync(models.Base.metadata.create_all)
 
