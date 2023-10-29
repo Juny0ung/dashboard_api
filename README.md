@@ -305,7 +305,7 @@ access-token을 통해서 로그아웃한다.
     "id": "Integer"
   }
   "next_cursor": {
-    "is_sort": "Integer" = 0,
+    "is_sort": "Integer",
     "id": "Integer"
   }
 }
