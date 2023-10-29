@@ -1,16 +1,17 @@
-from fastapi import Header, HTTPException
-from .db.base import SessionLocal
+from fastapi import HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+from .db.base import engine
 import redis
 import jwt
 import string
 import random
 
-def get_db():
-    db = SessionLocal()
+async def get_db_session():
+    asyncsession = AsyncSession(bind = engine)
     try:
-        yield db
+        yield asyncsession
     finally:
-        db.close()
+        await asyncsession.close()
 
 redis_client = redis.StrictRedis(host = '127.0.0.1', port = '25100', db = 0, decode_responses=True)
 SECRET_KEY = 'secret_key'
