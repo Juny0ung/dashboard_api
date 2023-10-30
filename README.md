@@ -77,7 +77,7 @@ API를 구현하기 위해 세 개의 database table을 만들었다.
 ```
 
 ### 로그인
-이메일, 비밀번호로 로그인한다. header를 통해서 access-token을 받는다. access-token은 jwt를 활용했고 보안을 위해 payload에 random 값을 추가했다.
+이메일, 비밀번호로 로그인한다. headers를 통해서 access-token을 받는다. access-token은 jwt를 활용했고 보안을 위해 payload에 random 값을 추가했다.
 #### Request
 `POST /user/login`
 ```json
@@ -89,7 +89,7 @@ API를 구현하기 위해 세 개의 database table을 만들었다.
 ```
 #### Response
 ```json
-"header": {
+"headers": {
   "access-token": "String"
 }
 ```
@@ -99,7 +99,7 @@ access-token을 통해서 로그아웃한다.
 #### Request
 `POST /user/logout`
 ```json
-"header": {
+"headers": {
   "access-token": "String"
 }
 ```
@@ -116,7 +116,7 @@ access-token을 통해서 로그아웃한다.
 #### Request
 `POST /dashboard`
 ```json
-"header": {
+"headers": {
   "access-token": "String"
 },
 "body": {
@@ -140,7 +140,7 @@ access-token을 통해서 로그아웃한다.
 #### Request
 `PUT /dashboard`
 ```json
-"header": {
+"headers": {
   "access-token": "String"
 },
 "parameters": {
@@ -168,7 +168,7 @@ access-token을 통해서 로그아웃한다.
 #### Request
 `POST /dashboard/delete`
 ```json
-"header": {
+"headers": {
   "access-token": "String"
 },
 "parameters": {
@@ -192,7 +192,7 @@ access-token을 통해서 로그아웃한다.
 #### Request
 `GET \dashboard`
 ```json
-"header": {
+"headers": {
   "access-token": "String"
 },
 "parameters": {
@@ -217,7 +217,7 @@ access-token을 통해서 로그아웃한다.
 #### Request
 `GET \dashboard\list`
 ```json
-"header": {
+"headers": {
   "access-token": "String"
 },
 "parameters": {
@@ -246,7 +246,7 @@ access-token을 통해서 로그아웃한다.
 #### Request
 `POST \post`
 ```json
-"header": {
+"headers": {
   "access-token": "String"
 },
 "parameters": {
@@ -273,7 +273,7 @@ access-token을 통해서 로그아웃한다.
 #### Request
 `PUT \post`
 ```json
-"header": {
+"headers": {
   "access-token": "String"
 },
 "parameters": {
@@ -300,7 +300,7 @@ access-token을 통해서 로그아웃한다.
 #### Request
 `POST \post\delete`
 ```json
-"header": {
+"headers": {
   "access-token": "String"
 },
 "parameters": {
@@ -323,7 +323,7 @@ access-token을 통해서 로그아웃한다.
 #### Request
 `GET \post`
 ```json
-"header": {
+"headers": {
   "access-token": "String"
 },
 "parameters": {
@@ -342,11 +342,11 @@ access-token을 통해서 로그아웃한다.
 ```
 
 ### 게시글 list 조회하기
-게시판 id를 통해 본인이 게시판에 있는 게시글 list를 조회한다. `pgsize`개의 게시글을 조회하는데 이전 조회의 마지막 게시글의 `id`를 통해 다음 `pgsize`개의 게시글을 효율적으로 조회한다. `pgsize`의 default 값은 10이다.
+게시판 id를 통해 본인이 게시판에 있는 게시글 list를 조회한다. `pgsize`개의 게시글을 조회하는데 이전 조회의 마지막 게시글의 `id`를 `next_cursor`에 전달 받아 다음 `pgsize`개의 게시글을 효율적으로 조회한다. `pgsize`의 default 값은 10이다.
 #### Request
 `GET \post\list`
 ```json
-"header": {
+"headers": {
   "access-token": "String"
 },
 "parameters": {
