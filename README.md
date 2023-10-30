@@ -213,7 +213,7 @@ access-token을 통해서 로그아웃한다.
 ### 게시판 list 조회하기
 본인이 조회할 수 있는 게시판의 list를 조회한다. `cursor`의 값에 따라 id 순이나 게시글 순으로 조회한다. `pgsize`개의 게시판을 조회하는데 이전 조회의 마지막 게시판의 `id`나 `posts_cnt` 값을 `next_cursor`를 통해 전달 받아 다음 `pgsize`개의 게시글을 효율적으로 조회한다.
 
-`cursor`는 `1_{posts_cnt}_{id}`나 `0_{id}`의 형태를 갖는다. 앞 글자가 1인 경우 게시글 순으로 조회하고 0인 경우 id 순으로 조회한다. 
+초기에 `cursor`값을 전달하지 않으면 id 순으로 `pgsize` 게시판을 조회한다. `cursor`값을 `1`로 전달하면 게시글 수 순으로 `pgsize` 게시판을 조회한다. 이후에는 response로 받은 `next_cursor`를 `cursor`에 parameter로 넣어서 전달하면 그 다음 `pgsize` 게시글을 반환한다. `cursor`는 id 순 정렬일 경우 `0_{id}`, 게시글 수 순 정렬일 경우 `1_{posts_cnt}_{id}`의 형태를 갖는다. 이전 `pgsize` 게시글을 조회하는데 활용하기 위해 `current_cursor`에 현재 `cursor`를 저장해 반환한다. `pgsize`의 default 값은 10이다.
 #### Request
 `GET \dashboard\list`
 ```json
@@ -342,7 +342,7 @@ access-token을 통해서 로그아웃한다.
 ```
 
 ### 게시글 list 조회하기
-게시판 id를 통해 본인이 게시판에 있는 게시글 list를 조회한다. `pgsize`개의 게시글을 조회하는데 이전 조회의 마지막 게시글의 `id`를 `next_cursor`에 전달 받아 다음 `pgsize`개의 게시글을 효율적으로 조회한다. `pgsize`의 default 값은 10이다.
+게시판 id를 통해 본인이 게시판에 있는 게시글 list를 조회한다. `pgsize` 게시글을 조회하는데 이전 조회의 마지막 게시글의 `id`를 `next_cursor`에 전달 받아 다음 `pgsize` 게시글을 효율적으로 조회한다. 초기에는 `cursor` 값을 전달하지 않아도 `pgsize` 게시글을 반환한다. 이후에는 response로 받은 `next_cursor`를 `cursor` parameter로 넣어서 전달하면 그 다음 `pgsize` 게시글을 반환한다. 이전 `pgsize` 게시글을 조회하는데 활용하기 위해 `current_cursor`에 현재 `cursor`를 저장해 반환한다. `pgsize`의 default 값은 10이다.
 #### Request
 `GET \post\list`
 ```json
