@@ -10,7 +10,7 @@ pip install -r requirements.txt
 ## Run
 ```
 docker-compose up
-python uvicorn app.main ~~
+python -m uvicorn app.main:app --reload
 ```
 
 ## Database
