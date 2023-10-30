@@ -17,14 +17,14 @@ router = APIRouter(
 async def log_in(user: schemas.UserLogin, res: Response, sess: AsyncSession = Depends(get_db_session)):
     user_id = await func_user.auth_user(sess = sess, user = user)
     if user_id:
-        res.headers['access-token'] = set_access_token(user_id)
+        res.headers['access-token'] = await set_access_token(user_id)
         return
     raise HTTPException(status_code=400, detail="Wrong Information")
     
 
 @router.post("/logout")
-def log_out(access_token: Annotated[str | None, Header()] = None):
-    return delete_access_token(access_token)
+async def log_out(access_token: Annotated[str | None, Header()] = None):
+    return await delete_access_token(access_token)
 
 @router.post("/signup")
 async def create_user(user: schemas.UserCreate, sess: AsyncSession = Depends(get_db_session)):
