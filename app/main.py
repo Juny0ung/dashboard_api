@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from .api import user, post, dashboard
-from .api.db import models, crud, schemas
+from .api.router import user, post, dashboard
+from .api.db import models
 from .api.db.base import engine
 from .api.token import init_redis
 
