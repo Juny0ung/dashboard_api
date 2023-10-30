@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from .api.router import user, post, dashboard
 from .api.db import models
 from .api.db.base import engine
-from .api.token import init_redis, close_redis
+from .api.token import init_redis
 
 app = FastAPI()
 
@@ -22,5 +22,4 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    await close_redis()
     await engine.dispose()

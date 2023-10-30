@@ -17,10 +17,6 @@ async def init_redis():
     # for python 3.10
     redis_client = await aioredis.from_url('redis://127.0.0.1:25100', db = 0, decode_responses=True)
 
-async def close_redis():
-    if redis_client:
-        redis_client.close()
-        await redis_client.wait_closed()
 
 async def set_access_token(user_id: int):
     if redis_client:

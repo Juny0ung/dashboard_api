@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List
 
 class PostBase(BaseModel):
     title: str
@@ -7,14 +8,19 @@ class PostBase(BaseModel):
 class PostCreate(PostBase):
     pass
 
-
 class Post(PostBase):
     id: int
-    writer: int
-    dashboard: int
+    writer_id: int
+    dashboard_id: int
 
     class Config:
         orm_mode = True
+
+class PostList(BaseModel):
+    results: List[Post]
+    next_cursor: str
+    current_cursor: str
+
 
 
 class DashboardBase(BaseModel):
@@ -24,15 +30,22 @@ class DashboardBase(BaseModel):
 class DashboardCreate(DashboardBase):
     pass
 
-class Dashboard(DashboardCreate):
+class DashboardInfo(DashboardBase):
     id: int
+    creator_id: int
     posts_cnt: int
-    posts: list[Post] = []
-    creator: str
-
     class Config:
         orm_mode = True
 
+class Dashboard(DashboardInfo):
+    posts: list[Post] = []
+    class Config:
+        orm_mode = True
+
+class DashboardList(BaseModel):
+    results: List[DashboardInfo]
+    next_cursor: str
+    current_cursor: str
 
 class UserBase(BaseModel):
     email: str
@@ -44,18 +57,14 @@ class UserCreate(UserBase):
     password: str
     fullname: str
 
-class User(UserBase):
+class UserInfo(UserBase):
     id: int
+    fullname: str
+
+class User(UserInfo):
     posts: list[Post] = []
     dashboards: list[Dashboard] = []
 
     class Config:
         orm_mode = True
-
-
-class Cursor(BaseModel):
-    is_sort: int = 0            # 0 : with id, 1 : with the number of posts (descending order)
-
-    id: int | None = None
-    posts_cnt: int | None = None
 

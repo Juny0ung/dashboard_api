@@ -1,6 +1,7 @@
 import hashlib
 import string
 import random
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from .. import models, schemas
@@ -31,7 +32,7 @@ async def auth_user(sess: AsyncSession, user: schemas.UserCreate):
         db_user = result.scalars().first()
         if hash_password(user.password, db_user.salt)[1] == db_user.hash_password:
             return db_user.id
-        return None
+        raise HTTPException(status_code=400, detail="Wrong Information")
 
 async def create_user(sess: AsyncSession, user: schemas.UserCreate):
     salt, hash_pw = hash_password(user.password)
@@ -40,4 +41,4 @@ async def create_user(sess: AsyncSession, user: schemas.UserCreate):
         db.add(db_user)
         await db.commit()
         await db.refresh(db_user)
-        return db_user
+        return schemas.UserInfo.from_orm(db_user)
