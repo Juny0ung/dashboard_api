@@ -57,7 +57,7 @@ API를 구현하기 위해 세 개의 database table을 만들었다.
 사용자를 추가한다. 이름, 이메일, 비밀번호를 통해서 사용자를 추가한다. 이때, 비밀번호는 암호화해서 DB에 저장된다.
 #### Request
 
-`POST /user/signup`
+`POST /user`
 
 ```json
 "body": {
@@ -67,12 +67,22 @@ API를 구현하기 위해 세 개의 database table을 만들었다.
 }
 ```
 
+#### Response
+```json
+"body": {
+  "id": "Integer"
+  "fullname": "String",
+  "email": "String"
+}
+```
+
 ### 로그인
 이메일, 비밀번호로 로그인한다. header를 통해서 access-token을 받는다. access-token은 jwt를 활용했고 보안을 위해 payload에 random 값을 추가했다.
 #### Request
 `POST /user/login`
 ```json
 "body": {
+  "id": "Integer"
   "email": "String",
   "password": "String"
 }
@@ -94,10 +104,17 @@ access-token을 통해서 로그아웃한다.
 }
 ```
 
+#### Response
+```json
+"body": {
+  "id": "Integer"
+}
+```
+
 ### 게시판 만들기
 게시판의 이름과 공개 여부를 통해서 게시판을 만든다. access-token을 통해서 생성자를 확인한다.
 #### Request
-`POST /dashboard/create`
+`POST /dashboard`
 ```json
 "header": {
   "access-token": "String"
@@ -107,11 +124,21 @@ access-token을 통해서 로그아웃한다.
   "public": "Boolean"
 }
 ```
+#### Response
+```json
+"body": {
+  "id": "Integer"
+  "name": "String",
+  "public": "Boolean",
+  "creator_id": "Integer",
+  "posts_cnt": "Integer"
+}
+```
 
 ### 게시판 업데이트 하기
 게시판의 id로 게시판의 이름과 공개 여부를 수정한다. 본인이 만든 게시판만 수정할 수 있다.
 #### Request
-`PUT /dashboard/update`
+`PUT /dashboard`
 ```json
 "header": {
   "access-token": "String"
@@ -122,6 +149,17 @@ access-token을 통해서 로그아웃한다.
 "body": {
   "name": "String",
   "public": "Boolean"
+}
+```
+
+#### Response
+```json
+"body": {
+  "id": "Integer"
+  "name": "String",
+  "public": "Boolean",
+  "creator_id": "Integer",
+  "posts_cnt": "Integer"
 }
 ```
 
@@ -138,10 +176,21 @@ access-token을 통해서 로그아웃한다.
 }
 ```
 
+#### Response
+```json
+"body": {
+  "id": "Integer"
+  "name": "String",
+  "public": "Boolean",
+  "creator_id": "Integer",
+  "posts_cnt": "Integer"
+}
+```
+
 ### 게시판 조회하기
 게시판의 id를 통해서 게시판을 조회한다. 공개되었거나 본인이 만들어서 본인이 확인할 수 있는 게시판만 조회할 수 있다.
 #### Request
-`GET \dashboard\get`
+`GET \dashboard`
 ```json
 "header": {
   "access-token": "String"
@@ -153,15 +202,18 @@ access-token을 통해서 로그아웃한다.
 #### Response
 ```json
 "body": {
-  "id": "Integer",
+  "id": "Integer"
   "name": "String",
   "public": "Boolean",
-  "creator_id": "Integer"
+  "creator_id": "Integer",
+  "posts_cnt": "integer"
 }
 ```
 
 ### 게시판 list 조회하기
-본인이 조회할 수 있는 게시판의 list를 조회한다. `is_sort`가 0이면 id 순으로 조회하고 1이면 가지고 있는 게시글 순으로 조회한다. `pgsize`개의 게시판을 조회하는데 이전 조회의 마지막 게시판의 `id`나 `posts_cnt`를 통해 다음 `pgsize`개의 게시글을 효율적으로 조회한다.
+본인이 조회할 수 있는 게시판의 list를 조회한다. `cursor`의 값에 따라 id 순이나 게시글 순으로 조회한다. `pgsize`개의 게시판을 조회하는데 이전 조회의 마지막 게시판의 `id`나 `posts_cnt` 값을 `next_cursor`를 통해 전달 받아 다음 `pgsize`개의 게시글을 효율적으로 조회한다.
+
+`cursor`는 `1_{posts_cnt}_{id}`나 `0_{id}`의 형태를 갖는다. 앞 글자가 1인 경우 게시글 순으로 조회하고 0인 경우 id 순으로 조회한다. 
 #### Request
 `GET \dashboard\list`
 ```json
@@ -169,12 +221,8 @@ access-token을 통해서 로그아웃한다.
   "access-token": "String"
 },
 "parameters": {
-  "pgsize": "Integer"
-}
-"body": {
-  "is_sort": "Integer",
-  "id": "Integer",
-  "posts_cnt": "Integer"
+  "pgsize": "Integer",
+  "cursor": "String"
 }
 ```
 #### Response
@@ -188,23 +236,42 @@ access-token을 통해서 로그아웃한다.
       "creator_id": "Integer"
     }
   ],
-  "current_cursor": {
-    "is_sort": "Integer",
-    "id": "Integer",
-    "posts_cnt": "Integer"
-  }
-  "next_cursor": {
-    "is_sort": "Integer",
-    "id": "Integer",
-    "posts_cnt": "Integer"
-  }
+  "current_cursor": "String"
+  "next_cursor": "String"
 } 
 ```
 
 ### 게시글 작성하기
 본인이 조회할 수 있는 게시판에 게시글을 작성한다.
 #### Request
-`POST \post\create`
+`POST \post`
+```json
+"header": {
+  "access-token": "String"
+},
+"parameters": {
+  "dashid": "Integer"
+},
+"body": {
+  "title": "String",
+  "content": "String"
+}
+```
+#### Response
+```json
+"body": {
+  "id": "Integer"
+  "title": "String",
+  "content": "String",
+  "writer_id": "Integer",
+  "dashboard_id": "Integer"
+}
+```
+
+### 게시글 수정하기
+본인이 작성한 게시글을 수정한다.
+#### Request
+`PUT \post`
 ```json
 "header": {
   "access-token": "String"
@@ -217,21 +284,14 @@ access-token을 통해서 로그아웃한다.
   "content": "String"
 }
 ```
-
-### 게시글 수정하기
-본인이 작성한 게시글을 수정한다.
-#### Request
-`POST \post\update`
+#### Response
 ```json
-"header": {
-  "access-token": "String"
-},
-"parameters": {
-  "id": "Integer"
-},
 "body": {
+  "id": "Integer"
   "title": "String",
-  "content": "String"
+  "content": "String",
+  "writer_id": "Integer",
+  "dashboard_id": "Integer"
 }
 ```
 
@@ -247,11 +307,21 @@ access-token을 통해서 로그아웃한다.
   "id": "Integer"
 }
 ```
+#### Response
+```json
+"body": {
+  "id": "Integer"
+  "title": "String",
+  "content": "String",
+  "writer_id": "Integer",
+  "dashboard_id": "Integer"
+}
+```
 
 ### 게시글 조회하기
 게시글 id를 통해 본인이 조회할 수 있는 게시판에 있는 게시글을 조회한다.
 #### Request
-`POST \post\get`
+`GET \post`
 ```json
 "header": {
   "access-token": "String"
@@ -263,7 +333,7 @@ access-token을 통해서 로그아웃한다.
 #### Response
 ```json
 "body": {
-  "id": "Integer",
+  "id": "Integer"
   "title": "String",
   "content": "String",
   "writer_id": "Integer",
@@ -272,27 +342,24 @@ access-token을 통해서 로그아웃한다.
 ```
 
 ### 게시글 list 조회하기
-게시판 id를 통해 본인이 게시판에 있는 게시글 list를 조회한다. `pgsize`개의 게시글을 조회하는데 이전 조회의 마지막 게시글의 `id`를 통해 다음 `pgsize`개의 게시글을 효율적으로 조회한다.
+게시판 id를 통해 본인이 게시판에 있는 게시글 list를 조회한다. `pgsize`개의 게시글을 조회하는데 이전 조회의 마지막 게시글의 `id`를 통해 다음 `pgsize`개의 게시글을 효율적으로 조회한다. `pgsize`의 default 값은 10이다.
 #### Request
-`POST \post\list`
+`GET \post\list`
 ```json
 "header": {
   "access-token": "String"
 },
 "parameters": {
-  "id": "Integer",
-  "pgsize": "Integer"
-},
-"body": {
-  "is_sort": "Integer",
-  "id": "Integer"
+  "dashid": "Integer",
+  "pgsize": "Integer",
+  "cursor": "String"
 }
 ```
 #### Response
 ```json
 "body": {
   "result": [
-    "body": {
+    {
       "id": "Integer",
       "title": "String",
       "content": "String",
@@ -300,13 +367,7 @@ access-token을 통해서 로그아웃한다.
       "dashboard_id": "Integer"
     }
   ],
-  "current_cursor": {
-    "is_sort": "Integer",
-    "id": "Integer"
-  }
-  "next_cursor": {
-    "is_sort": "Integer",
-    "id": "Integer"
-  }
+  "current_cursor": "String"
+  "next_cursor": "String"
 }
 ```
