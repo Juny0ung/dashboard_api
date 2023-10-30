@@ -5,13 +5,13 @@ from fastapi import HTTPException
 from typing import List
 from .. import models, schemas
 
-async def _get_dashboard_by_name(sess: AsyncSession, name: str):
+async def get_dashboard_by_name(sess: AsyncSession, name: str):
     async with sess as db:
         stmt = select(models.Dashboard).filter(models.Dashboard.name == name)
         result = await db.execute(stmt)
         return result.scalars().first()
 
-async def _get_dashboard_by_id(sess: AsyncSession, id: int):
+async def get_dashboard_by_id(sess: AsyncSession, id: int):
     async with sess as db:
         stmt = select(models.Dashboard).filter(models.Dashboard.id == id)
         result = await db.execute(stmt)
@@ -27,11 +27,11 @@ async def create_dashboard(sess: AsyncSession, dashboard: schemas.DashboardCreat
 
 async def update_dashboard(sess: AsyncSession, dash_id: int, dashboard: schemas.DashboardCreate, user_id: int):
     async with sess as db:
-        db_dash = await _get_dashboard_by_name(sess = db, name = dashboard.name)
+        db_dash = await get_dashboard_by_name(sess = db, name = dashboard.name)
         if db_dash and db_dash.id != dash_id:
             raise HTTPException(status_code=400, detail="Already Existed Name")
         elif not db_dash:
-            db_dash = await _get_dashboard_by_id(sess = db, id = dash_id)
+            db_dash = await get_dashboard_by_id(sess = db, id = dash_id)
         _assert_valid(db_dash = db_dash, user_id = user_id)
         print(db_dash)
         db_dash.name = dashboard.name
@@ -43,7 +43,7 @@ async def update_dashboard(sess: AsyncSession, dash_id: int, dashboard: schemas.
 
 async def delete_dashboard(sess: AsyncSession, dash_id: int, user_id: int):
     async with sess as db:
-        db_dash = await _get_dashboard_by_id(sess = db, id = dash_id)
+        db_dash = await get_dashboard_by_id(sess = db, id = dash_id)
         _assert_valid(db_dash = db_dash, user_id = user_id)
 
         res = schemas.DashboardInfo.from_orm(db_dash)
@@ -52,7 +52,7 @@ async def delete_dashboard(sess: AsyncSession, dash_id: int, user_id: int):
         return res
 
 async def get_dashboard(sess: AsyncSession, dash_id: int, user_id: int):
-    db_dash = await _get_dashboard_by_id(sess = sess, id = dash_id)
+    db_dash = await get_dashboard_by_id(sess = sess, id = dash_id)
     _assert_valid(db_dash = db_dash, user_id = user_id, isView = True)
     return schemas.DashboardInfo.from_orm(db_dash)
 
@@ -74,7 +74,7 @@ async def list_dashboard(sess: AsyncSession, user_id: int, cursor: str, pgsize: 
             else:
                 next_cursor = _next_cursor_ordered_by_id(db_dashes[-1])
         else:
-            next_cursor = {}
+            next_cursor = "0"
 
         return {"results": [schemas.DashboardInfo.from_orm(db_dash) for db_dash in db_dashes], "next_cursor": next_cursor, "current_cursor" : cursor}
 

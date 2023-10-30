@@ -61,6 +61,9 @@ class UserInfo(UserBase):
     id: int
     fullname: str
 
+    class Config:
+        orm_mode = True
+
 class User(UserInfo):
     posts: list[Post] = []
     dashboards: list[Dashboard] = []

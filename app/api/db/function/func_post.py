@@ -2,10 +2,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from fastapi import HTTPException
 from .. import models, schemas
-from .func_dash import _get_dashboard_by_id
+from .func_dash import get_dashboard_by_id
 
 async def get_valid_dash(sess: AsyncSession, dash_id: int, user_id: int):
-    dash = await _get_dashboard_by_id(sess = sess, id = dash_id)
+    dash = await get_dashboard_by_id(sess = sess, id = dash_id)
     if dash and (dash.public or dash.creator_id == user_id):
         return dash
     raise HTTPException(status_code=400, detail="Invalid Dashboard")
@@ -48,7 +48,7 @@ async def delete_post(sess: AsyncSession, post_id: int, user_id: int):
     async with sess as db:
         db_post = await get_post_by_id(sess = db, id = post_id)
         _assert_valid(db_post = db_post, user_id = user_id)
-        db_dash = await _get_dashboard_by_id(sess = db, id = db_post.dashboard_id)
+        db_dash = await get_dashboard_by_id(sess = db, id = db_post.dashboard_id)
         db_dash.posts_cnt -= 1
         db.add(db_dash)
         res = schemas.Post.from_orm(db_post)
