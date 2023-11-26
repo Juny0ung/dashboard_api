@@ -22,20 +22,20 @@ async def set_access_token(user_id: int):
     if redis_client:
         rand = "".join(random.choices(string.ascii_letters + string.digits + string.punctuation, k = 16))
         token = jwt.encode({"user_id": user_id, 'rand': rand}, SECRET_KEY, algorithm = "HS256")
-        await redis_client.set(user_id, token)
+        await redis_client.set(rand + str(user_id), token)
         return token
 
 async def chk_access(token):
     if redis_client:
         payload = jwt.decode(token, 'secret_key', algorithms=["HS256"])
-        if await redis_client.get(payload['user_id']) == token: 
+        if await redis_client.get(payload['rand'] + str(payload['user_id'])) == token: 
             return payload['user_id']
         raise HTTPException(status_code=400, detail="Invalid Access")
 
 async def delete_access_token(token):
     if redis_client:
         payload = jwt.decode(token, 'secret_key', algorithms=["HS256"])
-        if await redis_client.get(payload['user_id']) == token:
-            await redis_client.delete(payload['user_id'])
+        if await redis_client.get(payload['rand'] + str(payload['user_id'])) == token:
+            await redis_client.delete(payload['rand'] + str(payload['user_id']))
             return payload['user_id']
         raise HTTPException(status_code=400, detail="Invalid Access")
