@@ -166,7 +166,7 @@ access-token을 통해서 로그아웃한다.
 ### 게시판 삭제하기
 게시판의 id로 게시판을 삭제한다. 본인이 만든 게시판만 삭제할 수 있다.
 #### Request
-`POST /dashboard/delete`
+`DELETE /dashboard`
 ```json
 "headers": {
   "access-token": "String"
@@ -298,7 +298,7 @@ access-token을 통해서 로그아웃한다.
 ### 게시글 삭제하기
 본인이 작성한 게시글을 삭제한다.
 #### Request
-`POST \post\delete`
+`DELETE \post`
 ```json
 "headers": {
   "access-token": "String"
