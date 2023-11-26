@@ -24,7 +24,7 @@ async def update_dashboard(dashboard: schemas.DashboardCreate, id: int, sess: As
     user_id = await chk_access(access_token)
     return await func_dash.update_dashboard(sess = sess, dash_id = id, dashboard = dashboard, user_id = user_id)
 
-@router.post("/delete", status_code = 200, response_model = schemas.DashboardInfo)
+@router.delete("", status_code = 200, response_model = schemas.DashboardInfo)
 async def delete_dashboard(id: int, sess: AsyncSession = Depends(get_db_session), access_token: Annotated[str | None, Header()] = None):
     user_id = await chk_access(access_token)
     return await func_dash.delete_dashboard(sess = sess, dash_id = id, user_id = user_id)

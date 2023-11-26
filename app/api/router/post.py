@@ -22,7 +22,7 @@ async def update_post(id: int, post: schemas.PostCreate, sess: AsyncSession = De
     user_id = await chk_access(access_token)
     return await func_post.update_post(sess = sess, post_id = id, post = post, user_id = user_id)
 
-@router.post("/delete", status_code = 200, response_model = schemas.Post)
+@router.delete("", status_code = 200, response_model = schemas.Post)
 async def delete_post(id: int, sess: AsyncSession = Depends(get_db_session), access_token: Annotated[str | None, Header()] = None):
     user_id = await chk_access(access_token)
     return await func_post.delete_post(sess = sess, post_id = id, user_id = user_id)
